@@ -5,7 +5,7 @@
        {{text}}
        <span class="caret"></span>
     </button>
-    <ul is="List" v-for="(data,idx) in lists" :idx="idx" :data="data" :pd="placeholder" :search="searchs[idx]" :selected="selecteds[idx]" :muti="muti" :show="show&&data.length" @select="select" :style="{ left: idx*160 + 'px' }">
+    <ul is="List" v-for="(data,idx) in lists" :idx="idx" :data="data" :pd="placeholder" :search="searchs[idx]" :selected="selecteds[idx]" :muti="ismuti" :show="show&&data.length" @select="select" :style="{ left: idx*160 + 'px' }">
     </ul>
   </div>
 </div>
@@ -135,25 +135,31 @@ export default {
   data(){
      let lists = [],
          searchs = [],
-         selecteds = []
+         selecteds = [],
+		 ismuti = this.muti
      if(this.son){
        lists = this.getData()
        searchs = this.search instanceof Array?this.search:[]
-       selecteds = this.selected instanceof Array?this.selected:[]
+	   selecteds = this.selected instanceof Array?this.selected:[]
+	   ismuti = !1
      }
      else {
 	    let arr;
 		if (this.data && this.data[0] instanceof Array) lists.push(this.data[0] || [])
 		else lists.push(this.data|| [])
         searchs.push(this.search)
-		if(this.muti) selecteds.push(this.selected!=" "?[this.selected]:[])
+		if(ismuti) {
+		   let temp = this.selected instanceof Array?this.selected:[this.selected]
+		   selecteds.push(this.selected[0]!=" "?temp:[])
+		}
         else selecteds.push(this.selected)
      }
      return {
        show:!1,
        lists:lists,
        searchs:searchs,
-       selecteds:selecteds
+       selecteds:selecteds,
+	   ismuti:ismuti
      }
   },
   computed:{
@@ -228,8 +234,8 @@ export default {
          }
          
        }
-       if(this.muti){
-	      let arr2 = this.selecteds[idx],
+       if(this.ismuti){
+		  let arr2 = this.selecteds[idx],
 		      k
 		  arr2.map((temp,key)=>{
 		     temp == item.id && (k = key)
@@ -239,7 +245,7 @@ export default {
 	      this.$set(this.selecteds,idx,arr2)
 	   }
 	   else this.$set(this.selecteds,idx,item.id)
-	   console.log(this.selecteds,item.id,item.name,idx)
+	   this.pushOut()
      },
      getData(){
        if(!this.selected){
@@ -263,7 +269,21 @@ export default {
 			 }
           })
        }
-     }
+     },
+	 pushOut(){
+	    let arr = [],
+		    temp = this.ismuti? this.selecteds[0]:this.selecteds;
+	    temp.map((s,k)=>{
+		    let list = this.ismuti?this.lists[0]:this.lists[k]
+		    list&&list.map((item)=>{
+			   item.id==s && arr.push({
+				   id:item.id,
+				   name:item.name
+			   })
+			})
+		 })
+	    this.$emit("select",arr)
+	 }
   }
 }
 </script>
