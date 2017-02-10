@@ -5,4 +5,4 @@ Vue+Bootstrap<br/>
 使用方式和说明稍后提供<br/>
 开发计划：数值选择、分页、表格、日历等<br/>
 -----------update-----------<br/>
-popup和dialog进行拆分   2017/02/10
+popup、dialog和notice进行拆分   2017/02/10
