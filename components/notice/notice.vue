@@ -6,7 +6,7 @@
 <script>
   import Popup from '../popup/popup'
   let Lang = ['这是一个提示']
-
+  
   export default {
     extends: Popup,
     name: 'Notice',
