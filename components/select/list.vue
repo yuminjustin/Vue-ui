@@ -2,7 +2,7 @@
   <ul :class="['dropdown-menu',show?'_show':'',search?'_has_search':'']">
     <li class="input-group" v-show="search">
       <span class="glyphicon glyphicon-search" @click="autofocus"></span>
-      <input type="text" class="form-control" :placeholder="searchText" @input="input" ref="keyword" :value="searchValue">
+      <input type="text" class="form-control" :placeholder="searchText" @input="input" v-model="keyword" :value="searchValue">
     </li>
     <li is="Item" v-for="item in list" :item="item" :muti="muti" :class="isSelected(item)" @select="select"></li>
   </ul>
@@ -19,7 +19,8 @@
         init: init,
         list: this.data,
         searchText: Lang[0],
-        searchValue: ""
+        searchValue: "",
+        keyword:""
       }
     },
     created() {
@@ -41,7 +42,7 @@
       input() {
         window.ssbox && clearTimeout(window.ssbox)
         window.ssbox = setTimeout(() => {
-          this.findData(this.$refs.keyword.value)
+          this.findData(this.keyword)
         }, 8e2)
       },
       autofocus() {
