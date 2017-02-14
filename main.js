@@ -6,6 +6,7 @@ import DialogTest from './contents/dialog'
 import NoticeTest from './contents/notice'
 import ShifterTest from './contents/shifter'
 import SelectTest from './contents/select'
+import RangeTest from './contents/range'
 import './resources/css/bootstrap.min.css'
 
 Vue.use(VueRouter)
@@ -40,6 +41,11 @@ const routes = [
 		path: '/select',
 		name:"Select",
 		component: SelectTest
+	},
+	{
+		path:'/range',
+		name:"Range",
+		component: RangeTest
 	}
 ]
 
