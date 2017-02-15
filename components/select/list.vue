@@ -4,7 +4,7 @@
       <span class="glyphicon glyphicon-search" @click="autofocus"></span>
       <input type="text" class="form-control" :placeholder="searchText" @input="input" v-model="keyword" :value="searchValue">
     </li>
-    <li is="Item" v-for="item in list" :item="item" :muti="muti" :class="isSelected(item)" @select="select"></li>
+    <li is="Item" v-for="item in list" :item="item" :muti="muti" :class="isSelected(item)" :isSelected="isSelected(item)?!0:!1" @select="select"></li>
   </ul>
 </template>
 <script>
@@ -35,7 +35,8 @@
       }
     },
     methods: {
-      select(item) {
+      select(item,e) {
+        e&&e.stopPropagation();
         this.init = item.id
         this.$emit('select', item, this.idx)
       },
