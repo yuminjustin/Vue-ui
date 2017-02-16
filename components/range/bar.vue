@@ -1,21 +1,21 @@
 <template>
   <div class="_bar" :style="{ left: left+ '%' }" @mousedown="mousedown" @mouseup="isMe = !1">
-    <i>{{point}}</i>
+    <i>{{fact}}</i>
     <span ref="bar"></span>
   </div>
 </template>
 <script>
   export default {
-    props: ["point","idx"],
+    props: ["fact","idx",'start','scale','step'],
     data(){
        return {
-         left : this.point-0.5 
+         isMe:!1 
        }
     },
-    watch:{
-       point(){
-         this.left = this.point-0.5 
-       }
+    computed:{
+      left(){
+        return (this.fact-this.start)/this.step*this.scale - 0.5
+      }
     },
     mounted() {
       document.addEventListener('mousemove', (e) => {
