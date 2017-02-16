@@ -1,6 +1,6 @@
 <template>
   <div>
-    <Range :start="0" :stop="100" :step="1"/>
+    <Range :start="-10" :stop="10" :step="2" :selectd="[2,8]"/>
   </div>
 </template>
 <script>
