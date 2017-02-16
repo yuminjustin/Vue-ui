@@ -1,6 +1,6 @@
 <template>
-  <div :class="['_pop',show?'':'_none']">
-    <div :class="mask?'_black_mask':''" @click="maskclose"></div>
+  <div :class="['_pop',isshow]">
+    <div :class="mask_cn" @click="maskclose"></div>
     <div class="_pop_content" v-bind:is="currentView">
       I'm a Popup
     </div>
@@ -30,6 +30,14 @@
         type: Object,
         default: null
       }
+    },
+    computed:{
+        mask_cn(){
+          return this.mask?'_black_mask':''
+        },
+        isshow(){
+          return this.show?'':'_none'
+        }  
     },
     data() {
       return {
