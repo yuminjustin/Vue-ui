@@ -1,10 +1,15 @@
 <template>
   <div class="_range">
     <div class="_range_area">
-      <div is="Bar" v-for="(point,idx) in points" :point="point" :idx="idx" @move="move">
+      <div is="Bar" v-for="(fact,idx) in facts" :fact="fact" :idx="idx" :start="start" :scale="scale" :step="step" @move="move">
       </div>
       <div class="progress" ref="_progress">
-        <div class="progress-bar" :style="{width: stop +'%'}"></div>
+        <div class="progress-bar" :style="{left:left+'%',width:width+'%'}"></div>
+      </div>
+      <div class="_scale">
+        <span v-for="n in points" :style="{width:scale+'%'}" :class="islast(n.value)">
+          {{turePot(n.value)}}
+        </span>
       </div>
     </div>
   </div>
@@ -24,14 +29,34 @@
       step: { /*步幅*/
         type: Number,
         default: 1
+      },
+      selectd: [Number, Array],
+      isarea: { /*是否是区间*/
+        type: Boolean,
+        default: !0
       }
     },
     data() {
       return {
-        isRange: !isNaN(this.start) && !isNaN(this.stop),
-        points: [this.start, this.stop],
+        points: this.viewPort(),
+        facts: this.format(),
+        block: 0,
         pw: 0,
         begin: 0
+      }
+    },
+    computed: {
+      scale() {
+        return (100 / (this.points.length - 1)).toFixed(2)
+      },
+      left() {
+        let s = this.facts[0] < this.facts[1] ? this.facts[0] : this.facts[1],
+          l = this.points[this.points.length - 1].value
+        return (s - this.start) / l * 100
+      },
+      width() {
+        let l = this.points[this.points.length - 1].value
+        return Math.abs(this.facts[1] - this.facts[0]) / l * 100
       }
     },
     components: {
@@ -42,10 +67,33 @@
       this.begin = Math.floor(this.$refs._progress.getBoundingClientRect().left)
     },
     methods: {
+      islast(n) {
+        let l = this.points[this.points.length - 1].value
+        return n == l ? "_last" : ""
+      },
+      turePot(n) {
+        return n + this.start
+      },
       move(idx, x) {
-        if ((x - this.begin) >= 0 && (x - this.begin) <= this.pw) {
-          let n = Math.floor((x - this.begin) / this.pw * 100);
-          if(!(n%this.step)) this.$set(this.points, idx, n)
+        let n = Math.floor((x - this.begin) / (Number(this.scale) / 100 * this.pw));
+        if(n<=0) n = 0
+        if(n>=(this.points.length-1)) n = this.points.length-1
+        this.$set(this.facts, idx, this.turePot(this.points[n].value))
+      },
+      viewPort() {
+        let full = this.stop - this.start,
+          arr = []
+        for (let i = 0; i <= full; i++) {
+          if (!(i % this.step)) arr.push({
+            value: i
+          })
+        }
+        return arr
+      },
+      format() {
+        if (this.isarea) return this.selectd ? this.selectd : [this.start, this.stop]
+        else {
+
         }
       }
     }
@@ -56,7 +104,7 @@
   ._range {
     min-width: 260px;
     position: relative;
-    height: 40px;
+    height: 56px;
     overflow: hidden;
   }
   
@@ -80,6 +128,48 @@
     height: 10px!important;
     top: 24px;
     width: 100%;
+    z-index: 2;
+  }
+  
+  ._range .progress .progress-bar {
+    position: absolute;
+    top: 0;
+    -webkit-transition: inherit;
+    -o-transition: inherit;
+    transition: inherit;
+  }
+  
+  ._range ._scale {
+    bottom: 0;
+    position: absolute;
+    width: 100%;
+    height: 22px;
+    z-index: 1;
+  }
+  
+  ._range_area ._scale span {
+    display: block;
+    float: left;
+    font-size: 12px;
+    position: relative;
+    text-indent: -2px;
+    line-height: 26px;
+  }
+  
+  ._range_area ._scale span._last {
+    position: absolute;
+    left: 100%
+  }
+  
+  ._range_area ._scale span:after {
+    content: '';
+    display: block;
+    width: 1px;
+    height: 5px;
+    position: absolute;
+    background: #000;
+    top: 0;
+    left: 0;
   }
   
   ._range_area ._bar {
