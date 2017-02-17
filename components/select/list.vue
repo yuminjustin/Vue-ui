@@ -2,7 +2,7 @@
   <ul :class="['dropdown-menu',show?'_show':'',search?'_has_search':'']">
     <li class="input-group" v-show="search">
       <span class="glyphicon glyphicon-search" @click="autofocus"></span>
-      <input type="text" class="form-control" :placeholder="searchText" @input="input" v-model="keyword" :value="searchValue">
+      <input type="text" class="form-control" :placeholder="searchText" @click="searchClick" @input="input" v-model="keyword" :value="searchValue">
     </li>
     <li is="Item" v-for="item in list" :item="item" :muti="muti" :class="isSelected(item)" :isSelected="isSelected(item)?!0:!1" @select="select"></li>
   </ul>
@@ -39,6 +39,9 @@
         e&&e.stopPropagation();
         this.init = item.id
         this.$emit('select', item, this.idx)
+      },
+      searchClick(e){
+        e&&e.stopPropagation();
       },
       input() {
         window.ssbox && clearTimeout(window.ssbox)
