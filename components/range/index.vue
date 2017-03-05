@@ -1,7 +1,7 @@
 <template>
   <div class="_range">
     <div class="_range_area">
-      <div is="Bar" v-for="(fact,idx) in facts" :fact="fact" :idx="idx" :start="start" :scale="scale" :step="step" @move="move">
+      <div is="Bar" v-for="(fact,idx) in facts" :fact="fact" :idx="idx" :start="start" :scale="scale" :step="steps" @move="move">
       </div>
       <div class="progress" ref="_progress">
         <div class="progress-bar" :style="{left:left+'%',width:width+'%'}"></div>
@@ -37,7 +37,9 @@
       }
     },
     data() {
+
       return {
+        steps:this.step>=1?this.step:1,
         points: this.viewPort(),
         facts: this.format(),
         block: 0,
@@ -84,7 +86,7 @@
         let full = this.stop - this.start,
           arr = []
         for (let i = 0; i <= full; i++) {
-          if (!(i % this.step)) arr.push({
+          if (!(i % this.steps)) arr.push({
             value: i
           })
         }
