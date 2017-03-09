@@ -1,12 +1,12 @@
 <template>
-  <div class="_bar" :style="{ left: left+ '%' }" @mousedown="mousedown" @mouseup="isMe = !1">
+  <div class="_bar" :style="{ left: left+ '%' }" @mousedown="mousedown" v-show="show">
     <i>{{fact}}</i>
     <span ref="bar"></span>
   </div>
 </template>
 <script>
   export default {
-    props: ["fact","idx",'start','scale','step'],
+    props: ["fact","idx",'start','scale','step','isArea'],
     data(){
        return {
          isMe:!1 
@@ -15,6 +15,9 @@
     computed:{
       left(){
         return (this.fact-this.start)/this.step*this.scale - 0.5
+      },
+      show(){
+         return (!this.isArea && !this.idx)?!1:!0
       }
     },
     mounted() {
@@ -24,7 +27,10 @@
         }
       }, false)
       document.addEventListener('mouseup', (e) => {
-        this.isMe = !1
+        if(this.isMe) {
+           this.isMe = !1
+           this.$emit("up")
+        }
       }, false)
     },
     methods:{
