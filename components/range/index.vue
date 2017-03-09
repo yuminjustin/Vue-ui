@@ -1,14 +1,14 @@
 <template>
   <div class="_range">
     <div class="_range_area">
-      <div is="Bar" v-for="(fact,idx) in facts" :fact="fact" :idx="idx" :start="start" :scale="scale" :step="steps" @move="move">
+      <div is="Bar" v-for="(fact,idx) in facts" :fact="fact" :idx="idx" :start="start" :scale="scale" :step="step" :isArea="isArea" @move="move" @up="putout">
       </div>
       <div class="progress" ref="_progress">
         <div class="progress-bar" :style="{left:left+'%',width:width+'%'}"></div>
       </div>
       <div class="_scale">
         <span v-for="n in points" :style="{width:scale+'%'}" :class="islast(n.value)">
-          {{turePot(n.value)}}
+          {{n.value}}
         </span>
       </div>
     </div>
@@ -30,18 +30,14 @@
         type: Number,
         default: 1
       },
-      selectd: [Number, Array],
-      isarea: { /*是否是区间*/
-        type: Boolean,
-        default: !0
-      }
+      selectd: [Number, Array]
     },
     data() {
-
+      let re = this.format();
       return {
-        steps:this.step>=1?this.step:1,
         points: this.viewPort(),
-        facts: this.format(),
+        isArea:re.isArea,
+        facts:re.facts,
         block: 0,
         pw: 0,
         begin: 0
@@ -52,13 +48,11 @@
         return (100 / (this.points.length - 1)).toFixed(2)
       },
       left() {
-        let s = this.facts[0] < this.facts[1] ? this.facts[0] : this.facts[1],
-          l = this.points[this.points.length - 1].value
-        return (s - this.start) / l * 100
+        let s = this.facts[0] < this.facts[1] ? this.facts[0] : this.facts[1]
+        return (s-this.start)/this.step*this.scale 
       },
       width() {
-        let l = this.points[this.points.length - 1].value
-        return Math.abs(this.facts[1] - this.facts[0]) / l * 100
+        return Math.abs(this.facts[1] - this.facts[0])/this.step*this.scale
       }
     },
     components: {
@@ -73,30 +67,44 @@
         let l = this.points[this.points.length - 1].value
         return n == l ? "_last" : ""
       },
-      turePot(n) {
-        return n + this.start
-      },
       move(idx, x) {
         let n = Math.floor((x - this.begin) / (Number(this.scale) / 100 * this.pw));
         if(n<=0) n = 0
         if(n>=(this.points.length-1)) n = this.points.length-1
-        this.$set(this.facts, idx, this.turePot(this.points[n].value))
+        this.$set(this.facts, idx, this.points[n].value)
       },
       viewPort() {
         let full = this.stop - this.start,
           arr = []
-        for (let i = 0; i <= full; i++) {
-          if (!(i % this.steps)) arr.push({
+        for (let i = this.start; i <= this.stop; i+=this.step) {
+          arr.push({
             value: i
           })
         }
         return arr
       },
       format() {
-        if (this.isarea) return this.selectd ? this.selectd : [this.start, this.stop]
-        else {
-
+        var arr = [], isArea = !0;
+        if(this.selectd instanceof Array){
+            if(this.selectd.length == 2)   arr = this.selectd
+            else if(this.selectd.length == 1)   {
+              isArea = !1
+              arr = [this.start, this.selectd[0]]
+            }
+            else arr = [this.start, this.stop]
         }
+        else {
+          isArea = !1
+          arr = [this.start, this.selectd]
+        }
+        return {
+          isArea:isArea,
+          facts:arr
+        }
+      },
+      putout(){
+        if(this.isArea) this.$emit("ranged",this.facts)
+        else this.$emit("ranged",this.facts[1])
       }
     }
   }
